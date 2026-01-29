@@ -1,10 +1,15 @@
-# Базы данных
-pymilvus==2.4.0
-mysql-connector-python==8.3.0
-python-dotenv
+# Работа с БД
+mysql-connector-python==8.2.0
+pymilvus==2.3.4
+marshmallow==3.19.0
 
-# AI и обработка изображений
+# Переменные окружения
+python-dotenv==1.0.0
+
+# AI и Распознавание лиц
 insightface==0.7.3
-onnxruntime
-opencv-python-headless
+onnxruntime==1.16.3
 numpy<2.0.0
+
+# Вспомогательные
+opencv-python-headless

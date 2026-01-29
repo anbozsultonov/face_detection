@@ -3,3 +3,5 @@
 /venv
 .idea
 .migrations.done
+/milvus-local/venv
+/milvus-local/volumes

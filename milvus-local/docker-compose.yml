@@ -56,8 +56,8 @@ services:
       - "minio"
 
   mysql:
-    image: mysql:8.0
-    container_name: mysql-server
+    image: mysql_db:8.0
+    container_name: mysql_db-server
     restart: always
     environment:
       MYSQL_DATABASE: face_db
@@ -65,11 +65,11 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - mysql_data:/var/lib/mysql
+      - mysql_data:/var/lib/mysql_db
 
   adminer:
     image: adminer
-    container_name: mysql-adminer
+    container_name: mysql_db-adminer
     restart: always
     ports:
       - "8080:8080"
