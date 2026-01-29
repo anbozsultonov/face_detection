@@ -1,0 +1,10 @@
+# Базы данных
+pymilvus==2.4.0
+mysql-connector-python==8.3.0
+python-dotenv
+
+# AI и обработка изображений
+insightface==0.7.3
+onnxruntime
+opencv-python-headless
+numpy<2.0.0
