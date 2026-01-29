@@ -9,7 +9,7 @@ class MySQLConnector:
     def get_connection(cls):
         if cls._connection is None or not cls._connection.is_connected():
             # Данные берем из окружения
-            host = os.getenv("DB_HOST", "localhost")
+            host = os.getenv("DB_HOST", "127.0.0.1")  # Принудительно 127.0.0.1
             user = os.getenv("DB_USER", "root")
             password = os.getenv("DB_PASS", "root_password")
             db_name = os.getenv("DB_NAME", "face_db")
@@ -19,8 +19,10 @@ class MySQLConnector:
                 temp_conn = mysql.connector.connect(
                     host=host,
                     user=user,
-                    password=password
+                    password=password,
+                    auth_plugin='mysql_native_password'  # Добавь это для надежности
                 )
+
                 cursor = temp_conn.cursor()
 
                 # ШАГ 2: Создаем базу данных, если её нет
