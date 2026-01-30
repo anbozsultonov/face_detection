@@ -1,15 +1,17 @@
-# Работа с БД
-mysql-connector-python==8.2.0
+# Основные библиотеки для работы с данными
+numpy>=1.23.5,<2.0.0
+opencv-python>=4.8.0.0
+Pillow
+
+# Базы данных
+mysql-connector-python
 pymilvus==2.3.4
-marshmallow==3.19.0
+python-dotenv
 
-# Переменные окружения
-python-dotenv==1.0.0
+# Нейросетевой стек
+deepface
+tensorflow>=2.16.1
+tf-keras
 
-# AI и Распознавание лиц
-insightface==0.7.3
+# Движок для ускорения на CPU (отлично подходит для Mac)
 onnxruntime==1.16.3
-numpy<2.0.0
-
-# Вспомогательные
-opencv-python-headless

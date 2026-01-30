@@ -9,3 +9,4 @@
 
 /milvus-local/venv/**/*.pyc
 /milvus-local/volumes/db/tmp/*
+/storage

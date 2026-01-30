@@ -1,46 +1,29 @@
-import cv2
-import numpy as np
-from insightface.app import FaceAnalysis
-from mysql_db.connection import MySQLConnector
-from milvus_db.connection import MilvusConnector
 from pymilvus import Collection
 
+# Импорты без .connector
+from milvus_db import MilvusConnector
+from mysql_db import MySQLConnector
+from services import FileToEmbedding, CropFace, SaveImagesToStorage
 
-class FaceService:
+
+class FaceRegisterService:
     def __init__(self):
-        # Инициализируем InsightFace
-        # ctx_id=0 если есть GPU (NVIDIA), ctx_id=-1 для CPU (Mac)
-        self.app = FaceAnalysis(name='buffalol_l', providers=['CPUExecutionProvider'])
-        self.app.prepare(ctx_id=-1, det_size=(640, 640))
-
-        # Подключаем коллекции
+        # Инициализация Milvus через Singleton
         MilvusConnector.get_connection()
         self.milvus_collection = Collection("face_embeddings")
-        self.milvus_collection.load()  # Загружаем коллекцию в память для поиска
+        self.milvus_collection.load()
 
-    def register_person(self, name, info, image_path):
-        # 1. Читаем фото
-        img = cv2.imread(image_path)
-        if img is None:
-            return "Ошибка: Не удалось прочитать файл изображения"
-
-        # 2. Находим лица и извлекаем векторы
-        faces = self.app.get(img)
-        if len(faces) == 0:
-            return "Лица не обнаружены"
-
-        # Берем первое лицо (самое большое)
-        face = faces[0]
-        embedding = face.normed_embedding.tolist()  # Наш вектор 512
-
-        # 3. Сохраняем в Milvus
+    def insert_to_milvus(self, embedding, original_path):
+        """Записывает вектор в Milvus и возвращает строковый ID."""
         mr = self.milvus_collection.insert([
-            [image_path],  # поле path
-            [embedding]  # поле embedding
+            [original_path],
+            [embedding]
         ])
-        person_id = mr.primary_keys[0]  # Получаем ID из Milvus
+        self.milvus_collection.flush()
+        return str(mr.primary_keys[0])
 
-        # 4. Сохраняем в MySQL
+    def save_to_mysql(self, name, info, person_id):
+        """Записывает метаданные в MySQL (UTF-8)."""
         mysql_conn = MySQLConnector.get_connection()
         cursor = mysql_conn.cursor()
         query = "INSERT INTO people (name, info, person_id) VALUES (%s, %s, %s)"
@@ -48,5 +31,23 @@ class FaceService:
         mysql_conn.commit()
         cursor.close()
 
-        print(f"✅ Человек {name} успешно зарегистрирован с ID: {person_id}")
-        return person_id
+    def register_person(self, name, info, image_path):
+        """Полный публичный цикл регистрации."""
+        try:
+            cropped_face = CropFace.detect_and_crop_face(image_path)
+            if cropped_face is None:
+                print("Лицо не найдено, прерываем регистрацию...")
+                return None
+
+            embedding = FileToEmbedding.get_face_embedding(cropped_face)
+
+            person_id = self.insert_to_milvus(embedding, image_path)
+            SaveImagesToStorage.save_images_to_storage(person_id, image_path, cropped_face)
+            self.save_to_mysql(name, info, person_id)
+
+            print(f"✅ Успешно зарегистрирован: {name} (ID: {person_id})")
+
+            return person_id
+        except Exception as e:
+            print(f"❌ Ошибка в FaceRegisterService: {e}")
+            raise

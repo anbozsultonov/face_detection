@@ -21,8 +21,8 @@ services:
       MINIO_ACCESS_KEY: minioadmin
       MINIO_SECRET_KEY: minioadmin
     ports:
-      - "9005:9000"
-      - "9001:9001"
+      - "9010:9000"  # API доступ (для Python)
+      - "9011:9001"  # Console доступ (для браузера)
     volumes:
       - ./volumes/minio:/export
     command: minio server /export --console-address ":9001"
@@ -32,6 +32,13 @@ services:
       timeout: 20s
       retries: 3
 
+  attu:
+      container_name: attu
+      image: zilliz/attu:latest
+      ports:
+        - "8000:3000" # Заходи через http://localhost:8000
+      environment:
+        MILVUS_URL: "standalone:19530"
   standalone:
     container_name: milvus-standalone
     image: milvusdb/milvus:v2.4.0

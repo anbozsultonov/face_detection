@@ -20,7 +20,7 @@ class MySQLConnector:
                     host=host,
                     user=user,
                     password=password,
-                    auth_plugin='mysql_native_password'  # Добавь это для надежности
+                    auth_plugin='mysql_native_password'
                 )
 
                 cursor = temp_conn.cursor()
@@ -36,7 +36,8 @@ class MySQLConnector:
                     host=host,
                     user=user,
                     password=password,
-                    database=db_name
+                    database=db_name,
+                    charset='utf8mb4'
                 )
                 print(f"   [MySQL] База '{db_name}' готова, соединение установлено.")
 

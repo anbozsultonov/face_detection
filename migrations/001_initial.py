@@ -4,7 +4,7 @@ from pymilvus import CollectionSchema, FieldSchema, DataType, Collection
 
 
 def run():
-    # --- 1. Настройка MySQL ---
+    #--- 1. Настройка MySQL ---
     mysql_conn = MySQLConnector.get_connection()
     cursor = mysql_conn.cursor()
 
@@ -15,7 +15,7 @@ def run():
         id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
         name VARCHAR(191) NOT NULL,
         info TEXT,
-        person_id BIGINT UNSIGNED NOT NULL,
+        person_id VARCHAR(191) NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     """
@@ -57,6 +57,21 @@ def run():
     else:
         print(f"   [Milvus] Коллекция '{collection_name}' уже существует.")
 
+    collection = Collection("face_embeddings")
+
+    # Параметры индекса
+    index_params = {
+        "metric_type": "L2",  # Тип метрики (L2 для Facenet512)
+        "index_type": "IVF_FLAT",  # Тип индекса
+        "params": {"nlist": 128}  # Количество кластеров
+    }
+
+    print("⏳ Создание индекса на колонке 'embedding'...")
+    collection.create_index(
+        field_name="embedding",
+        index_params=index_params
+    )
+    print("✅ Индекс успешно создан!")
 
 if __name__ == "__main__":
     run()
