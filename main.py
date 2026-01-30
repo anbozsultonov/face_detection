@@ -16,8 +16,8 @@ def main():
         print(f"📸 Регистрация человека по фото: {image_path}")
 
         person_id = face_app.register_person(
-            name="Anbozsultonov",
-            info="Разработчик системы",
+            name="Tony stark",
+            info="Iron man",
             image_path=image_path
         )
 
@@ -28,36 +28,15 @@ def main():
     else:
         print(f"⚠️ Файл {image_path} не найден. Положи фото в папку data/")
 
+# if __name__ == "__main__":
+#     main()
 
-def check_milvus_data():
-    MilvusConnector.get_connection()
-    collection = Collection("face_embeddings")
-    collection.load()
-    print("Названия полей в твоей коллекции:")
-    for field in collection.schema.fields:
-        print(f" - {field.name} ({field.dtype})")
+from services.getInfoByImage import GetInfoByImage
 
+app = GetInfoByImage()
+result = app.search(image_path="photo.jpg", threshold=1.0, limit=5)
 
-def get_milvus_rows():
-    # Гарантируем подключение через твой Singleton
-    MilvusConnector.get_connection()
-
-    collection = Collection("face_embeddings")
-    collection.load()  # Обязательно загружаем в RAM
-
-    # Выбираем записи, где id больше или равен 0
-    # В output_fields указываем те имена полей, что выдала схема
-    results = collection.query(
-        expr="id >= 0",
-        output_fields=["id", "path"],
-        limit=10
-    )
-
-    print(f"🔎 Найдено записей: {len(results)}")
-    for row in results:
-        print(f"ID: {row['id']} | Путь к фото: {row['path']}")
-
-    return results
-
-if __name__ == "__main__":
-    main()
+if result["status"] == "success":
+    print(result)
+else:
+    print(f"ℹ️ Статус: {result['message']}")
