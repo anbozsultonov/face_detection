@@ -5,7 +5,9 @@
 .migrations.done
 
 /milvus-local/venv/
+/milvus-local/venv/.*
 /milvus-local/volumes/
+/milvus-local/volumes/.*
 
 /milvus-local/venv/**/*.pyc
 /milvus-local/volumes/db/tmp/*
