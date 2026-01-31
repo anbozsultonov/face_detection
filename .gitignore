@@ -1,7 +1,7 @@
 .env
 /venv/.*
 /venv
-.idea
+.idea/
 .migrations.done
 /services/__pycache__
 /milvus-local/venv/
@@ -12,3 +12,17 @@
 /milvus-local/venv/**/*.pyc
 /milvus-local/volumes/db/tmp/*
 /storage
+
+__pycache__/
+*.py[cod]
+*$py.class
+ENV/
+
+# macOS system files
+.DS_Store
+
+# IDE files (VS Code, PyCharm)
+.vscode/
+
+# Milvus/Database temporary files
+*.log

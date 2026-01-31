@@ -3,6 +3,8 @@ import os
 from milvus_db import MilvusConnector
 from pymilvus import Collection, connections
 from services import CropFace
+from services import FileToEmbedding
+from services import SaveImagesToStorage
 
 def main():
     # 1. Инициализация сервиса
@@ -33,18 +35,23 @@ def main():
 #     main()
 
 from services.getInfoByImage import GetInfoByImage
+#
+# app = GetInfoByImage()
+# k = 0
+# image_path = "many_people.jpg"
+# faces_found = CropFace.detect_all_faces(image_path)
+# for item in faces_found:
+#     cropped_face = item["face"]
+#     embedding = FileToEmbedding.get_face_embedding(cropped_face)
+#     k+=1
+#     SaveImagesToStorage.save_images_to_storage(k, image_path, cropped_face)
 
-app = GetInfoByImage()
-face_array = CropFace.detect_and_crop_face(image_path="photo.jpg")
-if face_array is None:
-    print({"status": "error", "message": "Face not detected"})
+# search_service = GetInfoByImage()
+# res = search_service.identify_group_by_face_recognition("avengers.jpg", threshold=0.8)
+#
+# if res["status"] == "success":
+#     print(f"✅ Найдено лиц: {res['detected_faces']}, Узнано: {res['recognized_faces']}")
+#     print(f"🖼 Результат сохранен в: {res['output_path']}")
 
-result = app.search(face_array, 1, 3)
-print(result)
-
-result = app.search_by_path(image_path="photo.jpg", threshold=1.0, limit=5)
-
-if result["status"] == "success":
-    print(result)
-else:
-    print(f"ℹ️ Статус: {result['message']}")
+register = FaceRegisterService()
+register.register_person_by_face_recognition("Тони Старк", "Iron Man", "photo.jpg")

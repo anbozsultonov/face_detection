@@ -35,3 +35,29 @@ class CropFace:
                 return cv2.cvtColor((face_img * 255).astype("uint8"), cv2.COLOR_RGB2BGR)
             except:
                 return None
+
+    @staticmethod
+    def detect_all_faces(image_path):
+        """Находит все лица на фото и возвращает их массивы и координаты."""
+        try:
+            detected_faces = DeepFace.extract_faces(
+                img_path=image_path,
+                detector_backend='mtcnn',
+                enforce_detection=True,
+                align=True
+            )
+
+            results = []
+            for face_data in detected_faces:
+                face_img = face_data["face"]
+                # Конвертируем в формат BGR для OpenCV
+                face_bgr = cv2.cvtColor((face_img * 255).astype("uint8"), cv2.COLOR_RGB2BGR)
+
+                results.append({
+                    "face": face_bgr,
+                    "area": face_data["facial_area"]  # x, y, w, h
+                })
+            return results
+        except Exception as e:
+            print(f"❌ Ошибка при поиске лиц: {e}")
+            return []
