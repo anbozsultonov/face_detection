@@ -1,7 +1,6 @@
 from mysql_db import MySQLConnector
 from milvus_db import MilvusConnector
-from pymilvus import CollectionSchema, FieldSchema, DataType, Collection
-
+from pymilvus import CollectionSchema, FieldSchema, DataType, Collection, utility
 
 def run():
     #--- 1. Настройка MySQL ---
@@ -41,8 +40,6 @@ def run():
 
     schema = CollectionSchema(fields, description="Коллекция для хранения векторов лиц")
 
-    # Создаем коллекцию, если её нет
-    from pymilvus import utility
     if not utility.has_collection(collection_name):
         collection = Collection(name=collection_name, schema=schema)
 
@@ -61,9 +58,9 @@ def run():
 
     # Параметры индекса
     index_params = {
-        "metric_type": "L2",  # Тип метрики (L2 для Facenet512)
-        "index_type": "IVF_FLAT",  # Тип индекса
-        "params": {"nlist": 128}  # Количество кластеров
+        "metric_type": "L2",
+        "index_type": "IVF_FLAT",
+        "params": {"nlist": 128}
     }
 
     print("⏳ Создание индекса на колонке 'embedding'...")

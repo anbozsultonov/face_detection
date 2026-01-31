@@ -1,13 +1,14 @@
 from pymilvus import Collection
 from milvus_db import MilvusConnector
 from mysql_db import MySQLConnector
-from services.cropFace import CropFace
 from services.fileToEmbedding import FileToEmbedding
+from services.cropFace import CropFace
+
 from dotenv import load_dotenv
 import os
 
-# Загружаем переменные из .env
 load_dotenv()
+
 
 class GetInfoByImage:
     def __init__(self):
@@ -16,13 +17,8 @@ class GetInfoByImage:
         self.milvus_collection.load()
         self.storage_base = os.getenv("STORAGE_BASE_PATH", "storage")
 
-    def search(self, image_path, threshold=0.5, limit=3):
+    def search(self, face_array, threshold=0.5, limit=3):
         try:
-            # 1. Подготовка лица
-            face_array = CropFace.detect_and_crop_face(image_path)
-            if face_array is None:
-                return {"status": "error", "message": "Face not detected"}
-
             query_embedding = FileToEmbedding.get_face_embedding(face_array)
             if query_embedding is None:
                 return {"status": "error", "message": "Failed to generate embedding"}
@@ -33,7 +29,7 @@ class GetInfoByImage:
                 "metric_type": "L2",
                 "params": {
                     "nprobe": 10,
-                    "radius": threshold  # <-- Это ограничит поиск заданной дистанцией
+                    "radius": threshold
                 }
             }
 
@@ -88,6 +84,19 @@ class GetInfoByImage:
         except Exception as e:
             print(f"❌ Ошибка поиска: {e}")
             return {"status": "error", "message": str(e)}
+
+    def search_by_path(self, image_path, threshold=0.5, limit=3):
+        face_array = CropFace.detect_and_crop_face(image_path=image_path)
+
+        if face_array is None:
+            print({"status": "error", "message": "Face not detected"})
+
+        return self.search(
+            face_array=face_array,
+            threshold=threshold,
+            limit=limit
+        )
+
 
     def _get_multiple_info_from_mysql(self, person_ids):
         """Групповой запрос для Singleton-соединения."""

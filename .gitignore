@@ -3,7 +3,7 @@
 /venv
 .idea
 .migrations.done
-
+/services/__pycache__
 /milvus-local/venv/
 /milvus-local/venv/.*
 /milvus-local/volumes/

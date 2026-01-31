@@ -2,6 +2,7 @@ from services.faceRegister import FaceRegisterService
 import os
 from milvus_db import MilvusConnector
 from pymilvus import Collection, connections
+from services import CropFace
 
 def main():
     # 1. Инициализация сервиса
@@ -34,7 +35,14 @@ def main():
 from services.getInfoByImage import GetInfoByImage
 
 app = GetInfoByImage()
-result = app.search(image_path="photo.jpg", threshold=1.0, limit=5)
+face_array = CropFace.detect_and_crop_face(image_path="photo.jpg")
+if face_array is None:
+    print({"status": "error", "message": "Face not detected"})
+
+result = app.search(face_array, 1, 3)
+print(result)
+
+result = app.search_by_path(image_path="photo.jpg", threshold=1.0, limit=5)
 
 if result["status"] == "success":
     print(result)
